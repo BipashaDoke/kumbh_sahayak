@@ -1,4 +1,4 @@
-// Admin Dashboard System with Proper Department Mapping
+Admin Dashboard System with Proper Department Mapping
 class AdminSystem {
     constructor() {
         this.grievances = [];
@@ -10,10 +10,22 @@ class AdminSystem {
             'crowd': 'Crowd Management',
             'other': 'General Administration'
         };
-        this.init();
+        // Wait for the DOM to be fully loaded before initializing
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.init());
+        } else {
+            this.init();
+        }
     }
     
     init() {
+        // Check if we are on the admin dashboard
+        if (!document.getElementById('adminDashboard')) {
+            console.log('Admin dashboard not found. Skipping AdminSystem initialization.');
+            return;
+        }
+        
+        console.log('Initializing AdminSystem...');
         this.bindEvents();
         this.loadData();
         this.initRealTimeUpdates();
@@ -21,15 +33,24 @@ class AdminSystem {
     }
     
     bindEvents() {
+        console.log('Binding events...');
+        
         // Notification badge click
-        document.getElementById('adminNotificationBadge')?.addEventListener('click', () => {
-            this.toggleNotificationPanel();
-        });
+        const notificationBadge = document.getElementById('adminNotificationBadge');
+        if (notificationBadge) {
+            notificationBadge.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.toggleNotificationPanel();
+            });
+        }
         
         // Clear notifications
-        document.getElementById('clearNotifications')?.addEventListener('click', () => {
-            this.clearNotifications();
-        });
+        const clearNotificationsBtn = document.getElementById('clearNotifications');
+        if (clearNotificationsBtn) {
+            clearNotificationsBtn.addEventListener('click', () => {
+                this.clearNotifications();
+            });
+        }
         
         // Department card clicks to view department details
         document.querySelectorAll('.department-card').forEach(card => {
@@ -49,10 +70,20 @@ class AdminSystem {
             
             if (panel && panel.style.display === 'block' &&
                 !panel.contains(e.target) && 
-                !badge.contains(e.target)) {
+                badge && !badge.contains(e.target)) {
                 this.hideNotificationPanel();
             }
         });
+        
+        // Logout button
+        const logoutBtn = document.getElementById('adminLogout');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                // Switch back to auth screen
+                document.getElementById('adminDashboard').style.display = 'none';
+                document.getElementById('authScreen').style.display = 'block';
+            });
+        }
     }
     
     setupSampleData() {
@@ -198,19 +229,22 @@ class AdminSystem {
         const grievances = this.grievances;
         
         // Total grievances
-        document.getElementById('totalGrievances').textContent = grievances.length;
+        const totalEl = document.getElementById('totalGrievances');
+        if (totalEl) totalEl.textContent = grievances.length;
         
         // Active cases (pending + in_progress)
         const activeCases = grievances.filter(g => 
             g.status === 'pending' || g.status === 'in_progress'
         ).length;
-        document.getElementById('activeCases').textContent = activeCases;
+        const activeEl = document.getElementById('activeCases');
+        if (activeEl) activeEl.textContent = activeCases;
         
         // Emergency cases (high/emergency priority)
         const emergencyCases = grievances.filter(g => 
             g.priority === 'high' || g.priority === 'emergency'
         ).length;
-        document.getElementById('emergencyCases').textContent = emergencyCases;
+        const emergencyEl = document.getElementById('emergencyCases');
+        if (emergencyEl) emergencyEl.textContent = emergencyCases;
         
         // Average resolution time (simplified)
         const resolvedCases = grievances.filter(g => g.status === 'resolved');
@@ -224,7 +258,8 @@ class AdminSystem {
         });
         
         const avgHours = resolvedCases.length > 0 ? (totalHours / resolvedCases.length).toFixed(1) : 0;
-        document.getElementById('avgResolution').textContent = `${avgHours}h`;
+        const avgEl = document.getElementById('avgResolution');
+        if (avgEl) avgEl.textContent = `${avgHours}h`;
     }
     
     updateDepartmentStats() {
@@ -276,24 +311,36 @@ class AdminSystem {
         console.log('Department Stats:', departmentStats);
         
         // Update Police Department
-        document.getElementById('policeNew').textContent = departmentStats.police.new;
-        document.getElementById('policeProgress').textContent = departmentStats.police.progress;
-        document.getElementById('policeDelayed').textContent = departmentStats.police.delayed;
+        const policeNewEl = document.getElementById('policeNew');
+        if (policeNewEl) policeNewEl.textContent = departmentStats.police.new;
+        const policeProgressEl = document.getElementById('policeProgress');
+        if (policeProgressEl) policeProgressEl.textContent = departmentStats.police.progress;
+        const policeDelayedEl = document.getElementById('policeDelayed');
+        if (policeDelayedEl) policeDelayedEl.textContent = departmentStats.police.delayed;
         
         // Update Medical Department
-        document.getElementById('medicalNew').textContent = departmentStats.medical.new;
-        document.getElementById('medicalProgress').textContent = departmentStats.medical.progress;
-        document.getElementById('medicalDelayed').textContent = departmentStats.medical.delayed;
+        const medicalNewEl = document.getElementById('medicalNew');
+        if (medicalNewEl) medicalNewEl.textContent = departmentStats.medical.new;
+        const medicalProgressEl = document.getElementById('medicalProgress');
+        if (medicalProgressEl) medicalProgressEl.textContent = departmentStats.medical.progress;
+        const medicalDelayedEl = document.getElementById('medicalDelayed');
+        if (medicalDelayedEl) medicalDelayedEl.textContent = departmentStats.medical.delayed;
         
         // Update Sanitation Department
-        document.getElementById('sanitationNew').textContent = departmentStats.sanitation.new;
-        document.getElementById('sanitationProgress').textContent = departmentStats.sanitation.progress;
-        document.getElementById('sanitationDelayed').textContent = departmentStats.sanitation.delayed;
+        const sanitationNewEl = document.getElementById('sanitationNew');
+        if (sanitationNewEl) sanitationNewEl.textContent = departmentStats.sanitation.new;
+        const sanitationProgressEl = document.getElementById('sanitationProgress');
+        if (sanitationProgressEl) sanitationProgressEl.textContent = departmentStats.sanitation.progress;
+        const sanitationDelayedEl = document.getElementById('sanitationDelayed');
+        if (sanitationDelayedEl) sanitationDelayedEl.textContent = departmentStats.sanitation.delayed;
         
         // Update Crowd Management
-        document.getElementById('crowdNew').textContent = departmentStats.crowd.new;
-        document.getElementById('crowdProgress').textContent = departmentStats.crowd.progress;
-        document.getElementById('crowdDelayed').textContent = departmentStats.crowd.delayed;
+        const crowdNewEl = document.getElementById('crowdNew');
+        if (crowdNewEl) crowdNewEl.textContent = departmentStats.crowd.new;
+        const crowdProgressEl = document.getElementById('crowdProgress');
+        if (crowdProgressEl) crowdProgressEl.textContent = departmentStats.crowd.progress;
+        const crowdDelayedEl = document.getElementById('crowdDelayed');
+        if (crowdDelayedEl) crowdDelayedEl.textContent = departmentStats.crowd.delayed;
     }
     
     updateRoutingTable() {
@@ -473,7 +520,7 @@ class AdminSystem {
                 this.grievances[grievanceIndex].overridden = true;
                 this.grievances[grievanceIndex].overrideReason = reason;
                 this.grievances[grievanceIndex].overriddenBy = 'admin';
-                this.grievance[grievanceIndex].overrideTime = new Date().toISOString();
+                this.grievances[grievanceIndex].overrideTime = new Date().toISOString();
                 
                 // Add update log
                 if (!this.grievances[grievanceIndex].updates) {
@@ -959,9 +1006,9 @@ class AdminSystem {
     }
 }
 
-// Initialize admin system
-document.addEventListener('DOMContentLoaded', () => {
-    // Only initialize if on admin dashboard
+// Initialize admin system when the page loads
+window.addEventListener('DOMContentLoaded', () => {
+    // Check if we are on the admin dashboard
     if (document.getElementById('adminDashboard')) {
         window.adminSystem = new AdminSystem();
     }
